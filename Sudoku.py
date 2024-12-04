@@ -247,6 +247,7 @@ class Jogo():
         self.container.pack()
         self.botoes = []
         self.numeros = []  
+        self.listaCheia = []
         contColuna = 0
         contLinha = 1
         for i in range(9):
@@ -257,6 +258,7 @@ class Jogo():
                 botao.config(command = lambda b = botao, c = coordenada: self.atualizar(b, c))
                 self.botoes.append(botao)
                 self.botoes.append(coordenada)
+                self.listaCheia.append(botao["text"])
                 if j == 2 or j == 5:
                     Frame(self.container, width = 4.35, bg = "gray", height = 37).grid(row = i + contLinha, column = j + contColuna + 1)
                     contColuna += 1
@@ -280,11 +282,16 @@ class Jogo():
             self.escolhaBotao.grid(row = 0, column = i - 1)
             self.escolhaBotao.config(command = lambda i = i, opcao = self.escolhaBotao: self.escolha(i, opcao))
             self.numeros.append(self.escolhaBotao)
+            contagem = self.listaCheia.count(str(i))
+            if str(i) in self.listaCheia and contagem == 9:
+                self.escolhaBotao.destroy()
 
     def escolha(self, valor, cor):
         try:
             self.tempCor["fg"] = "black"
         except TypeError:
+            pass
+        except TclError:
             pass
         cor["fg"] = "blue2"
         self.atual["text"] = "Número selecionado: " + str(valor)
@@ -300,6 +307,10 @@ class Jogo():
         verificacao = self.verificador.verificarCasa(coluna, linha, num, self.jogo.campoCheio, self.jogo.campoJogador)
         if verificacao == True:
             botao["text"] = self.temp
+            self.listaCheia.append(self.temp)
+            contagem = self.listaCheia.count(self.temp)
+            if self.temp in self.listaCheia and contagem == 9:
+                self.tempCor.destroy()
             botao["fg"] = "blue2"
             self.jogo.campoJogador[linha][coluna] = self.jogo.campoCheio[linha][coluna]
             self.pontuador.pontuar()
